@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,
+    initial-scale=1, shrink-to-fit=no">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> {{ title }} </title>
+  </head>
+  <body>
+  <table class="table-page" border=0 cellpadding="0" cellspacing="0">
+    <tr><td valign=top>
+    {% block mainmenu %}
+      <div id="header">
+        <ul class="mainmenu">
+          <li class="logo"><a href="{% url 'home' %}"></a></li>
+            {% for m in menu %}
+	            {% if not forloop.last %}
+			        <li class="header-text"><a href="{{ m.url_name }}">{{ m.title }}</a></li>
+	            {% else %}
+			        <li class="last header-text"><a href="{{ m.url_name }}">{{ m.title }}</a></li>
+	            {% endif %}
+            {% endfor %}
+        </ul>
+          <div class="clear"></div>
+      </div>
+    {% endblock mainmenu %}
+
+    <table class="table-content" border=0 cellpadding="0" cellspacing="0">
+    <tr>
+        <!-- Sidebar слева -->
+        <td valign="top" class="left-chapters">
+            <ul id="leftchapters">
+                {% if sidebar_categories %}
+
+                    {% if selected_category == 0 %}
+                            <li class="selected">Все категории</li>
+                    {% else %}
+                            <li><a href="{% url 'home' %}">Все категории</a></li>
+                    {% endif %}
+
+                    {% for c in sidebar_categories %}
+                        {% if c.pk == selected_category %}
+                            <li class="selected">{{c.name}}</li>
+                        {% else %}
+                            <li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                {% else %}
+                    <li>Список категорий пуст</li>
+                {% endif %}
+            </ul>
+        </td>
+    <!-- Конец Sidebar'а -->
+    <td valign="top" class="content">
+        <!-- Хлебные крошки -->
+        {% block breadcrumbs %}
+        {% endblock %}
+
+    <!-- Блок контента -->
+        <div class="content-text">
+        {% block content %}
+        {% endblock %}
+        </div>
+    <!-- Конец блока контента -->
+
+    </td></tr></table>
+    </td></tr>
+    <tr><td valign=top>
+        <div id="foot">
+          <p>Все права защищены &copy;</p>
+        </div>
+    </td></tr></table>
+  </body>
+</html>

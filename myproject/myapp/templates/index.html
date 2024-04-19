@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+	<ul class="list-articles">
+		{% for recipe in recipes %}
+			<li>
+				<div class="article-panel">
+				<p class="first">Категория: {{recipe.category}}</p>
+				</div>
+
+				<div class="recipe-details">
+				{% if recipe.image %}
+					<p><img class="img-article-left thumb" src="{{recipe.image.url}}"></p>
+				{% endif %}
+					<div>
+						<h2>{{recipe.title}}</h2>
+						<p>{{recipe.description}}</p>
+					</div>
+				</div>
+
+				<p>{{ recipe.cooking_steps|linebreaksbr}}</p>
+
+				<div class="clear"></div>
+				<p class="link-read-post"><a href="#">Читать пост</a></p>
+			</li>
+		{% endfor %}
+	</ul>
+{% endblock %}
