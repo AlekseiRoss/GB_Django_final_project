@@ -14,17 +14,14 @@ class HomeView(View):
         for recipe in recipes:
             recipe.cooking_steps = recipe.get_summary()
 
-        sidebar_categories = Category.objects.all()
-
         context = {
             'title': 'Главная страница',
             'recipes': recipes,
             'menu': menu,
-            'sidebar_categories': sidebar_categories,
             'selected_category': 0,
         }
 
-        return render(request, 'index.html', context)
+        return render(request, 'myapp/index.html', context)
 
 
 class ShowCategoryView(View):
@@ -34,19 +31,20 @@ class ShowCategoryView(View):
         recipes = Recipe.objects.filter(category_id=cat_id)
         for recipe in recipes:
             recipe.cooking_steps = recipe.get_summary()
-        sidebar_categories = Category.objects.all()
-        print(recipes)
 
         context = {
             'title': title,
             'recipes': recipes,
             'menu': menu,
-            'sidebar_categories': sidebar_categories,
             'selected_category': cat_id,
         }
 
-        return render(request, 'index.html', context)
+        return render(request, 'myapp/index.html', context)
 
+
+class RecipeView(View):
+    def get(self, request, recipe_id):
+        return HttpResponse(f"Отображение recipe с id = {recipe_id}")
 
 class AboutView(View):
     def get(self, request):
@@ -70,4 +68,4 @@ class RegisterView(View):
 
 class Custom404View(View):
     def get(self, request, exception):
-        return render(request, '404.html', status=404)
+        return render(request, 'myapp/404.html', status=404)

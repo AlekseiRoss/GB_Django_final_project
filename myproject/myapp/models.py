@@ -40,5 +40,8 @@ class Recipe(models.Model):
         trimmed_text += '...'
         return trimmed_text
 
+    def get_absolute_url(self):
+        return reverse('recipe', kwargs={'recipe_id': self.pk})
+
     def __str__(self):
         return self.title

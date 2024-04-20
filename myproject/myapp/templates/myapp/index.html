@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'myapp/base.html' %}
 
 {% block content %}
 	<ul class="list-articles">
@@ -21,7 +21,7 @@
 				<p>{{ recipe.cooking_steps|linebreaksbr}}</p>
 
 				<div class="clear"></div>
-				<p class="link-read-post"><a href="#">Читать пост</a></p>
+				<p class="link-read-post"><a href="{{ recipe.get_absolute_url }}">Читать пост</a></p>
 			</li>
 		{% endfor %}
 	</ul>
