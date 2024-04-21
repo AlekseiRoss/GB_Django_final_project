@@ -18,7 +18,7 @@ class HomeView(View):
             'title': 'Главная страница',
             'recipes': recipes,
             'menu': menu,
-            'selected_category': 0,
+            'cat_selected': 0,
         }
 
         return render(request, 'myapp/index.html', context)
@@ -36,7 +36,7 @@ class ShowCategoryView(View):
             'title': title,
             'recipes': recipes,
             'menu': menu,
-            'selected_category': cat_id,
+            'cat_selected': cat_id,
         }
 
         return render(request, 'myapp/index.html', context)
