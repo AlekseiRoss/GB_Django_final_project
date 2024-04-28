@@ -1,0 +1,13 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+    <h2>{{recipe.title}}</h2>
+				<div class="recipe-details">
+
+				{% if recipe.image %}
+					<p><img style="max-width: 275px;" src="{{recipe.image.url}}"></p>
+				{% endif %}
+				</div>
+                <p>{{ recipe.description|linebreaksbr}}</p>
+				<p>{{ recipe.cooking_steps|linebreaksbr}}</p>
+{% endblock %}

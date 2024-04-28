@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+import os
 
 
 class Category(models.Model):
@@ -18,9 +19,12 @@ class Recipe(models.Model):
     description = models.TextField()
     cooking_steps = models.TextField()
     preparation_time = models.DurationField()
-    image = models.ImageField(upload_to='recipes/images/')
+    image = models.ImageField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    time_create = models.DateTimeField(auto_now_add=True)
+    time_update = models.DateTimeField(auto_now=True)
+    is_published = models.BooleanField(default=True)
 
     @property
     def formatted_cooking_steps(self):
@@ -30,14 +34,15 @@ class Recipe(models.Model):
             return ''
 
     def get_summary(self):
-        # Разбиваем текст на слова
+        words_number = 8
+        max_len = 32
+        if len(str(self.cooking_steps)) > max_len:
+            return str(self.cooking_steps)[:max_len]+'...'
         words = str(self.cooking_steps).split()
-        # Обрезаем текст после первых 8 слов
-        trimmed_text = ' '.join(words[:8])
-        # Заменяем символы '\n' на фактические переносы строк '\n'
+        trimmed_text = ' '.join(words[:words_number])
         trimmed_text = trimmed_text.replace('\\n', '\n')
-        # Добавляем многоточие в конце
-        trimmed_text += '...'
+        if len(words) > words_number:
+            trimmed_text += '...'
         return trimmed_text
 
     def get_absolute_url(self):

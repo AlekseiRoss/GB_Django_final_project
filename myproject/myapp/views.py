@@ -1,59 +1,108 @@
 from django.http import HttpResponse, Http404
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
+from django.core.files.storage import FileSystemStorage
+from django.urls import reverse_lazy
+from django.utils import timezone
+from django.views.generic import ListView, DetailView, CreateView
 from .models import *
+from .forms import *
 
 menu = [{'title': "О сайте", 'url_name': 'about'},
-        {'title': "Добавить рецепт", 'url_name': 'add_receip'},
+        {'title': "Добавить рецепт", 'url_name': 'add_recipe'},
         {'title': "Войти", 'url_name': 'login'}]
 
 
-class HomeView(View):
-    def get(self, request):
-        recipes = Recipe.objects.all()
-        for recipe in recipes:
+class Home(ListView):
+    model = Recipe
+    template_name = 'myapp/index.html'
+    context_object_name = 'recipes'
+
+    # Функция передаёт в шаблон и стат и динам данные
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['title'] = 'Главная страница'
+        context['cat_selected'] = 0
+        for recipe in context['recipes']:
             recipe.cooking_steps = recipe.get_summary()
+        return context
 
-        context = {
-            'title': 'Главная страница',
-            'recipes': recipes,
-            'menu': menu,
-            'cat_selected': 0,
-        }
-
-        return render(request, 'myapp/index.html', context)
+    def get_queryset(self):
+        return Recipe.objects.filter(is_published=True)
 
 
-class ShowCategoryView(View):
-    def get(self, request, cat_id):
-        category = Category.objects.get(pk=cat_id)  # Получить объект категории
-        title = category.name  # Извлечь имя категории
-        recipes = Recipe.objects.filter(category_id=cat_id)
-        for recipe in recipes:
+class ShowCategory(ListView):
+    model = Recipe
+    template_name = 'myapp/index.html'
+    context_object_name = 'recipes'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cat_id = self.kwargs['cat_id']
+        category = get_object_or_404(Category, pk=cat_id)
+        context['menu'] = menu
+        context['title'] = category.name
+        context['cat_selected'] = cat_id
+        for recipe in context['recipes']:
             recipe.cooking_steps = recipe.get_summary()
+        return context
 
-        context = {
-            'title': title,
-            'recipes': recipes,
-            'menu': menu,
-            'cat_selected': cat_id,
-        }
-
-        return render(request, 'myapp/index.html', context)
+    def get_queryset(self):
+        cat_id = self.kwargs['cat_id']
+        return Recipe.objects.filter(is_published=True,
+                                     category__pk=cat_id)
 
 
-class RecipeView(View):
-    def get(self, request, recipe_id):
-        return HttpResponse(f"Отображение recipe с id = {recipe_id}")
+class ShowRecipe(DetailView):
+    model = Recipe
+    template_name = 'myapp/recipe.html'
+    context_object_name = 'recipe'
+    pk_url_kwarg = 'recipe_id'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['title'] = self.object.title
+        context['cat_selected'] = self.object.category.pk
+        context['recipe'].cooking_steps = self.object.formatted_cooking_steps
+        return context
+
+
+class AddRecipe(CreateView):
+    template_name = 'myapp/add_recipe.html'
+    form_class = AddRecipeForm
+    success_url = reverse_lazy('home')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Добавить рецепт'
+        context['menu'] = menu
+        return context
+
+    def form_valid(self, form):
+        try:
+            # Создаем временный путь для сохранения изображения
+            current_time = timezone.now().strftime('%Y%m%d%H%M%S')
+            image = form.cleaned_data.pop('image')
+            fs = FileSystemStorage()
+            # Сохраняем изображение
+            filename = fs.save(f'recipes/images/{current_time}/{image.name}',
+                               image)
+            # Создаем объект Recipe
+            form.instance.image = filename
+            form.instance.author_id = 1
+            form.instance.time_create = current_time
+            form.instance.time_update = current_time
+            return super().form_valid(form)
+        except Exception as e:
+            form.add_error(None, f'Ошибка добавления поста: {str(e)}')
+            return super().form_invalid(form)
+
 
 class AboutView(View):
     def get(self, request):
         return HttpResponse('О сайте')
-
-
-class AddReceipView(View):
-    def get(self, request):
-        return HttpResponse('Добавить рецепт')
 
 
 class LoginView(View):

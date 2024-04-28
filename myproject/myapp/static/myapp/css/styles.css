@@ -7,6 +7,10 @@ html, body {
 	--header-height: 45px;
 }
 
+.h1-my {
+	margin-bottom: 20px;
+}
+
 #foot {
   position: fixed; /* Фиксированная позиция */
   bottom: 0; /* Прикрепление к нижнему краю */
@@ -191,6 +195,10 @@ div.button {
 	padding: 5px 20px 5px 20px;
 	border-radius: 10px;
 	font-size: 20px;
+}
+
+.button-submit {
+	margin-bottom: 20px;
 }
 
 .table-content {
@@ -400,6 +408,7 @@ ul.lang-list li a:hover {color: #fdc073;}
 }
 
 .form-button {
+	margin-bottom: 20px;
     min-width: 200px;
     font-size: 16px;
 }

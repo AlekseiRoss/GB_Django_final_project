@@ -1,0 +1,21 @@
+{% extends 'myapp/base.html' %}
+
+{% block content %}
+<h1 class="h1-my">{{title}}</h1>
+
+<form action="{% url 'add_recipe' %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="form-error">{{ form.non_field_errors }}</div>
+
+    {% for f in form %}
+        {% if f.name != 'author' %}
+            <p><label class="form-label" style="max-width: 150px" for="{{ f.id_for_label }}">{{f.label}}: </label>{{ f }}</p>
+            <div class="form-error">{{ f.errors }}</div>
+        {% endif %}
+    {% endfor %}
+
+    <button class="button-submit" type="submit">Добавить</button>
+</form>
+
+{% endblock %}
