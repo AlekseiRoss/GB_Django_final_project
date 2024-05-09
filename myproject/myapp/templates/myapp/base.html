@@ -23,9 +23,9 @@
           <li class="logo"><a href="{% url 'home' %}"></a></li>
             {% for m in menu %}
 	            {% if not forloop.last %}
-			        <li class="header-text"><a href="{{ m.url_name }}">{{ m.title }}</a></li>
+			        <li class="header-text"><a href="{% url m.url_name %}">{{ m.title }}</a></li>
 	            {% else %}
-			        <li class="last header-text"><a href="{{ m.url_name }}">{{ m.title }}</a></li>
+			        <li class="last header-text"><a href="{% url m.url_name %}">{{ m.title }}</a></li>
 	            {% endif %}
             {% endfor %}
         </ul>
@@ -45,7 +45,16 @@
                         <li><a href="{% url 'home' %}">Все категории</a></li>
                 {% endif %}
 
-                {% show_categories cat_selected=cat_selected %}
+                {% for c in cats %}
+                    {% if c.recipe__count > 0 %}
+                        {% if c.pk == cat_selected %}
+                            <li class="selected">{{c.name}}</li>
+                        {% else %}
+                            <li><a href="{{ c.get_absolute_url }}">{{c.name}}</a></li>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
             </ul>
         </td>
     <!-- Конец Sidebar'а -->
@@ -55,10 +64,38 @@
         {% endblock %}
 
     <!-- Блок контента -->
-        <div class="content-text">
+    <div class="content-text">
         {% block content %}
         {% endblock %}
-        </div>
+
+        {% if page_obj.has_other_pages %}
+<nav class="list-pages">
+  <ul>
+    {% if page_obj.has_previous %}
+    <li class="page-num" onclick="window.location='?page={{ page_obj.previous_page_number }}'">
+      <a>&lt;</a>
+    </li>
+    {% endif %}
+    {% for p in paginator.page_range %}
+    {% if page_obj.number == p %}
+    <span class="page-num-selected">
+      {{ p }}
+    </span>
+    {% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2  %}
+    <li class="page-num" onclick="window.location='?page={{ p }}'">
+      {{ p }}
+    </li>
+        {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+    <li class="page-num" onclick="window.location='?page={{ page_obj.next_page_number }}'">
+      <a>&gt;</a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+    </div>
     <!-- Конец блока контента -->
 
     </td></tr></table>

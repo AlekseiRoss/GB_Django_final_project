@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
-import os
 
 
 class Category(models.Model):
@@ -34,14 +33,20 @@ class Recipe(models.Model):
             return ''
 
     def get_summary(self):
-        words_number = 8
-        max_len = 32
-        if len(str(self.cooking_steps)) > max_len:
-            return str(self.cooking_steps)[:max_len]+'...'
-        words = str(self.cooking_steps).split()
-        trimmed_text = ' '.join(words[:words_number])
+        max_length = 40  # Максимальная длина текста
+        cooking_steps_str = str(self.cooking_steps)
+        # Обрезаем текст до максимальной длины
+        trimmed_text = cooking_steps_str[:max_length]
+        # Если текст был обрезан, ищем последнее пробельное место для
+        # корректного обрезания слов
+        if len(trimmed_text) < len(cooking_steps_str):
+            last_space_index = trimmed_text.rfind(' ')
+            if last_space_index != -1:
+                trimmed_text = trimmed_text[:last_space_index]
+        # Заменяем символы '\\n' на переносы строк
         trimmed_text = trimmed_text.replace('\\n', '\n')
-        if len(words) > words_number:
+        # Если текст был обрезан, добавляем многоточие в конце
+        if len(trimmed_text) < len(cooking_steps_str):
             trimmed_text += '...'
         return trimmed_text
 
