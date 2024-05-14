@@ -4,7 +4,7 @@ html, body {
 	height: 100%;
 	width: 100%;
 	color: #444;
-	--header-height: 45px;
+	--header-height: 50px;
 }
 
 .h1-my {
@@ -37,17 +37,17 @@ ul.mainmenu {
     color: #fdc073;
     font-size: 20px;
     overflow: hidden;
+	display: flex; /* Добавлено */
+    align-items: center; /* Добавлено */
 }
 
 ul.mainmenu li {
     height: inherit;
-    display: inline-block; /* Изменено на display: inline-block; */
-    vertical-align: middle; /* Добавлено */
 }
 
-ul.mainmenu li.logo {
-    width: 50px;
-    margin: 0 20px 7px 20px;
+li.logo {
+	width: var(--header-height);
+    margin: 0 20px 0 40px;
 }
 
 li.logo a {
@@ -62,15 +62,27 @@ li.logo a {
 }
 
 li.header-text {
-    margin: 7px 20px 0 20px;
+    margin: 0px 20px;
 }
 
-ul.mainmenu li.last {float: right;}
+ul.mainmenu li.last {
+	margin-left: auto;
+	margin-right: 20px;
+}
+
+li.pipe {
+    display: flex;
+    align-items: center;
+}
 
 ul.mainmenu li a {
+	height: inherit;
 	color: #000000;
 	text-decoration: none;
+	display: flex; /* Использование Flexbox */
+    align-items: center; /* Центрирование по вертикали */
 }
+
 ul.mainmenu li a:hover {
 	color: #FDA83D;
 }

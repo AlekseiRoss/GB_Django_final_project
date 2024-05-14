@@ -20,7 +20,8 @@ class Home(DataMixin, ListView):
         context = super().get_context_data(**kwargs)
         for recipe in context['recipes']:
             recipe.cooking_steps = recipe.get_summary()
-        c_def = self.get_user_context(title='Главная страница')
+        c_def = self.get_user_context(title='Главная страница',
+                                      cat_selected=0)
         context = dict(list(context.items()) + list(c_def.items()))
         return context
 
@@ -73,8 +74,7 @@ class AddRecipe(LoginRequiredMixin, DataMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        c_def = self.get_user_context(title='Добавить рецепт',
-                                      cat_selected=-1)
+        c_def = self.get_user_context(title='Добавить рецепт')
         context = dict(list(context.items()) + list(c_def.items()))
         return context
 
@@ -97,9 +97,16 @@ class LoginView(View):
         return HttpResponse('Вход')
 
 
-class RegisterView(View):
-    def get(self, request):
-        return HttpResponse('Регистрация')
+class RegisterView(DataMixin, CreateView):
+    form_class = RegisterUserForm
+    template_name = 'myapp/register.html'
+    success_url = reverse_lazy('login')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title='Регистрация')
+        context = dict(list(context.items()) + list(c_def.items()))
+        return context
 
 
 class Custom404View(View):

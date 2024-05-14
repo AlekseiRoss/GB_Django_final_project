@@ -3,8 +3,7 @@ from django.db.models import Count
 from .models import *
 
 menu = [{'title': "О сайте", 'url_name': 'about'},
-        {'title': "Добавить рецепт", 'url_name': 'add_recipe'},
-        {'title': "Войти", 'url_name': 'login'}]
+        {'title': "Добавить рецепт", 'url_name': 'add_recipe'}]
 
 
 class DataMixin:
@@ -20,5 +19,5 @@ class DataMixin:
         context['menu'] = user_menu
         context['cats'] = cats
         if 'cat_selected' not in context:
-            context['cat_selected'] = 0
+            context['cat_selected'] = -1
         return context
