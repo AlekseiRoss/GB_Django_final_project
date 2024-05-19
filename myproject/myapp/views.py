@@ -1,5 +1,7 @@
+from django.contrib.auth import logout, login
+from django.contrib.auth.views import LoginView
 from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
@@ -92,11 +94,6 @@ class AboutView(View):
         return HttpResponse('О сайте')
 
 
-class LoginView(View):
-    def get(self, request):
-        return HttpResponse('Вход')
-
-
 class RegisterView(DataMixin, CreateView):
     form_class = RegisterUserForm
     template_name = 'myapp/register.html'
@@ -107,6 +104,30 @@ class RegisterView(DataMixin, CreateView):
         c_def = self.get_user_context(title='Регистрация')
         context = dict(list(context.items()) + list(c_def.items()))
         return context
+
+    def form_valid(self, form):
+        # user = form.save()
+        # login(self.request, user)
+        # return redirect('home')
+        return redirect('login')
+
+
+class LoginUser(DataMixin, LoginView):
+    form_class = LoginUserForm
+    template_name = 'myapp/login.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Авторизация")
+        return dict(list(context.items()) + list(c_def.items()))
+
+    def get_success_url(self):
+        return reverse_lazy('home')
+
+
+def logout_user(request):
+    logout(request)
+    return redirect('login')
 
 
 class Custom404View(View):

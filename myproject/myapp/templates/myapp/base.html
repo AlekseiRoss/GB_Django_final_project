@@ -21,12 +21,18 @@
       <div id="header">
         <ul class="mainmenu">
           <li class="logo"><a href="{% url 'home' %}"></a></li>
-            {% for m in menu %}
-              <li class="header-text"><a href="{% url m.url_name %}">{{ m.title }}</a></li>
-            {% endfor %}
-          <li class="last"><a href="{% url 'login' %}">Вход</a></li>
-          <li class="pipe">|</li>
-          <li class="header-text"><a href="{% url 'register' %}">Регистрация</a></li>
+          {% for m in menu %}
+            <li class="header-text"><a href="{% url m.url_name %}">{{ m.title }}</a></li>
+          {% endfor %}
+          {% if request.user.is_authenticated %}
+            <li class="last"> {{user.username}} </li>
+            <li class="pipe">|</li>
+            <li class="last2"><a href="{% url 'logout' %}">Выйти</a></li>
+          {% else %}
+            <li class="last"><a href="{% url 'login' %}">Вход</a></li>
+            <li class="pipe">|</li>
+            <li class="last2"><a href="{% url 'register' %}">Регистрация</a></li>
+          {% endif %}
         </ul>
           <div class="clear"></div>
       </div>
@@ -68,32 +74,32 @@
         {% endblock %}
 
         {% if page_obj.has_other_pages %}
-<nav class="list-pages">
-  <ul>
-    {% if page_obj.has_previous %}
-    <li class="page-num" onclick="window.location='?page={{ page_obj.previous_page_number }}'">
-      <a>&lt;</a>
-    </li>
-    {% endif %}
-    {% for p in paginator.page_range %}
-    {% if page_obj.number == p %}
-    <span class="page-num-selected">
-      {{ p }}
-    </span>
-    {% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2  %}
-    <li class="page-num" onclick="window.location='?page={{ p }}'">
-      {{ p }}
-    </li>
+        <nav class="list-pages">
+          <ul>
+            {% if page_obj.has_previous %}
+            <li class="page-num" onclick="window.location='?page={{ page_obj.previous_page_number }}'">
+              <a>&lt;</a>
+            </li>
+            {% endif %}
+            {% for p in paginator.page_range %}
+            {% if page_obj.number == p %}
+            <span class="page-num-selected">
+              {{ p }}
+            </span>
+            {% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2  %}
+            <li class="page-num" onclick="window.location='?page={{ p }}'">
+              {{ p }}
+            </li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-num" onclick="window.location='?page={{ page_obj.next_page_number }}'">
+              <a>&gt;</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
         {% endif %}
-    {% endfor %}
-    {% if page_obj.has_next %}
-    <li class="page-num" onclick="window.location='?page={{ page_obj.next_page_number }}'">
-      <a>&gt;</a>
-    </li>
-    {% endif %}
-  </ul>
-</nav>
-{% endif %}
     </div>
     <!-- Конец блока контента -->
 
