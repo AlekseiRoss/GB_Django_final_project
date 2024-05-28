@@ -80,9 +80,13 @@ class AddRecipe(LoginRequiredMixin, DataMixin, CreateView):
         context = dict(list(context.items()) + list(c_def.items()))
         return context
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
         try:
-            form.save(author_id=1)
             return super().form_valid(form)
         except Exception as e:
             form.add_error(None, f'Ошибка добавления поста: {str(e)}')

@@ -36,6 +36,10 @@ class AddRecipeForm(forms.ModelForm):
         queryset=Category.objects.all(), label="Категория", to_field_name='pk')
     is_published = forms.BooleanField(label="Опубликовано", required=False)
 
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
     def clean_title(self):
         title = self.cleaned_data.get('title')
         return title.strip()
@@ -54,19 +58,23 @@ class AddRecipeForm(forms.ModelForm):
             raise forms.ValidationError("Необходимо загрузить изображение")
         return image
 
-    def save(self, commit=True, author_id=1):
+    def save(self, commit=True):
         recipe = super().save(commit=False)
         time_now = timezone.now()
         current_time_formatted = time_now.strftime('%Y%m%d%H%M%S')
         image = self.cleaned_data['image']
         fs = FileSystemStorage()
-        filename = fs.save(f'recipes/images/{current_time_formatted}/'
-                           f'{image.name}', image)
+        filename = fs.get_available_name(
+            f'recipes/images/{self.user.pk}/{current_time_formatted}/'
+            f'{image.name}')
         recipe.image = filename
-        recipe.author_id = author_id
+        recipe.author = self.user
         recipe.time_create = time_now
         recipe.time_update = time_now
         if commit:
+            filename = fs.save(f'recipes/images/{self.user.pk}/'
+                               f'{current_time_formatted}/{image.name}', image)
+            recipe.image = filename
             recipe.save()
         return recipe
 
